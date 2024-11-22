@@ -1,23 +1,36 @@
 services:
-    devcanvas:
-        build: ./docker/dev/
-        volumes:
-            - devcanvas:/var/www/devcanvas
-        ports:
-            - "8000:8000"
-        depends_on:
-            - mysql
-        links:
-            - mysql
+  devcanvas:
+    build: ./docker/dev/
+    volumes:
+      - devcanvas:/var/www/devcanvas
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+    links:
+      - mysql
 
-    mysql:
-        image: mysql
-        volumes:
-            - mysql:/var/lib/mysql
-        environment:
-            MYSQL_DATABASE: devcanvas
-            MYSQL_ROOT_PASSWORD: toor
-            MYSQL_PASSWORD: toor
+  mysql:
+    image: mysql
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${PROJECT_NAME}
+      MYSQL_ROOT_PASSWORD: ${PROJECT_MYSQL_PASSWORD}
+      MYSQL_PASSWORD: ${PROJECT_MYSQL_PASSWORD}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "--host=localhost",
+          "--user=root",
+          "--password=${PROJECT_MYSQL_PASSWORD}",
+        ]
+      retries: 5
+      interval: 30s
+      timeout: 10s
 volumes:
-    mysql:
-    devcanvas:
+  mysql:
+  devcanvas:
