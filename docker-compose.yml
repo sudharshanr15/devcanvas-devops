@@ -7,8 +7,12 @@ services:
       - "8000:8000"
     depends_on:
       - mysql
+      - traefik
     links:
       - mysql
+    labels:
+      - "traefik.enable=true"
+      - ${PROJECT_TRAEFIK_LABELS_HOST}
 
   mysql:
     image: mysql
@@ -31,6 +35,18 @@ services:
       retries: 5
       interval: 30s
       timeout: 10s
+
+  traefik:
+    image: traefik:v3.2
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
 volumes:
   mysql:
   devcanvas:
